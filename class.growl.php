@@ -73,7 +73,7 @@
         {
             if(function_exists('socket_create') && function_exists('socket_sendto'))
             {
-				if(strlen(inet_pton($this->address)) > 4 && AF_INET6) {
+				if(strlen(inet_pton($this->address)) > 4 && defined('AF_INET6')) {
 					$sck = socket_create(AF_INET6, SOCK_DGRAM, SOL_UDP);
 				} else {
 					$sck = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
