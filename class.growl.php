@@ -73,8 +73,12 @@
         {
             if(function_exists('socket_create') && function_exists('socket_sendto'))
             {
-                $sck = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
-                socket_sendto($sck, $data, strlen($data), 0x100, $this->address, $this->port);
+				if(strlen(inet_pton($this->address)) > 4 && AF_INET6) {
+					$sck = socket_create(AF_INET6, SOCK_DGRAM, SOL_UDP);
+				} else {
+					$sck = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+				}
+                socket_sendto($sck, $data, strlen($data), MSG_WAITALL, $this->address, $this->port);
                 return true;
             }
             elseif(function_exists('fsockopen'))
