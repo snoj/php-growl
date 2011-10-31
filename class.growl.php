@@ -8,7 +8,7 @@
         const GROWL_PRIORITY_EMERGENCY = 2;
 
         private $appName;
-        public $address;
+        private $address;
         private $notifications;
         private $password;
         private $port;
