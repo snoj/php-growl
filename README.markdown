@@ -4,7 +4,8 @@ As a proof of concept example, I've written a [Mint](http://haveamint.com) [Pepp
 
     <?PHP
         $growl = new Growl($ip_address);
-        
+        $growl = new Growl("workstation.example.com");
+		
         // Adding and registering your notifications with Growl
         // only needs to be done once per computer. Growl will
         // remember your app after this.
@@ -17,3 +18,4 @@ As a proof of concept example, I've written a [Mint](http://haveamint.com) [Pepp
         
         // Send a second notification
         $growl->notify('Another Notification', 'Another Title', 'Something useful I hope.');
+

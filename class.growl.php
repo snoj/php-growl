@@ -8,7 +8,7 @@
         const GROWL_PRIORITY_EMERGENCY = 2;
 
         private $appName;
-        private $address;
+        public $address;
         private $notifications;
         private $password;
         private $port;
@@ -20,6 +20,28 @@
             $this->notifications = array();
             $this->password      = $password;
             $this->port          = 9887;
+			
+			if(@inet_pton($this->address) === false && ($tmp = dns_get_record($this->address, DNS_ANY)) !== false) {
+				$record_a = null;
+				$record_aaaa = null;
+				
+				foreach($tmp as $v) {
+					if($record_a === null && $v['type'] == 'A') {
+						$record_a = $v['ip'];
+					}
+					
+					if(defined('AF_INET6') && $record_aaaa === null && $v['type'] == 'AAAA') {
+						$record_aaaa = $v['ipv6'];
+					}
+				}
+				
+				if($record_aaaa !== null) {
+					$this->address = $record_aaaa;
+				}
+				if($record_a !== null) {
+					$this->address = $record_a;
+				}
+			}
         }
 
         public function addNotification($name, $enabled = true)
@@ -75,8 +97,16 @@
             {
 				if(strlen(inet_pton($this->address)) > 4 && defined('AF_INET6')) {
 					$sck = socket_create(AF_INET6, SOCK_DGRAM, SOL_UDP);
-				} else {
+				} elseif(strlen(inet_pton($this->address)) == 4) {
 					$sck = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP);
+				} else {
+					$error_str = "Error creating Socket";
+					
+					if(strlen(inet_pton($this->address)) > 4 && !defined('AF_INET6')) {
+						$error_str = sprintf("IPv6 address used, but IPv6 not enabled with this php build.", $this->address);
+					}
+					
+					throw new Exception($error_str);
 				}
                 socket_sendto($sck, $data, strlen($data), MSG_WAITALL, $this->address, $this->port);
                 return true;
